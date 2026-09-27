@@ -2,6 +2,7 @@
   "name": "job-seeker-bd-client",
   "private": true,
   "version": "0.0.0",
+  "author": "Pranto Chakrobortty",
   "type": "module",
   "scripts": {
     "dev": "vite",
