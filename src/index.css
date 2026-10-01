@@ -1,8 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Isometra&display=swap');
 @import "tailwindcss";
 @plugin "daisyui"{
-   themes: light --default;
+   themes: night --default;
  };
  .active {
-   background-color: #422ad5;
+   background-color: #3abdf8;
+   color: black;
    font-weight: bold;
  }
+ .isometra-regular {
+  font-family: "Isometra", serif;
+  font-weight: 400;
+  font-style: normal;
+}

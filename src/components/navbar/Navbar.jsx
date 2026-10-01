@@ -17,7 +17,7 @@ const Navbar = () => {
   const links = (
     <>
       <li>
-        <NavLink to="/">Home</NavLink>
+        <NavLink className='rounded-full' to="/">Home</NavLink>
       </li>
       
     </>
@@ -64,9 +64,9 @@ const Navbar = () => {
       </div>
       <div className="navbar-end gap-2">
         {
-          user ? <button onClick={handleLogOut} className="btn">Logout</button> : <>
+          user ? <button onClick={handleLogOut} className="btn btn-primary rounded-full font-bold">Logout</button> : <>
            <Link to="/register">Register</Link>
-        <Link to="/login" className="btn">Login</Link>
+        <Link to="/login" className="btn btn-primary rounded-full font-bold">Login</Link>
         </>
         }
        
