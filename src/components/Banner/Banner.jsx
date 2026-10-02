@@ -78,9 +78,9 @@ const Banner = () => {
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight"
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight "
             >
-              Find a Job That <br />
+              Find a <span className="text-primary isometra-regular">Job</span> That <br />
               <span className="text-primary inline-block min-w-[300px]">
                 <AnimatePresence mode="wait">
                   <motion.span
