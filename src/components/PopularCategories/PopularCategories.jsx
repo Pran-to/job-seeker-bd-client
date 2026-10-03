@@ -51,7 +51,7 @@ const categories = [
 
 const PopularCategories = () => {
   return (
-    <section className="bg-base-100 py-20 md:py-24 overflow-hidden">
+    <section className="bg-base-100 pt-20 pb-10 md:pt-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 md:px-8 lg:px-10">
 
         {/* ================= HEADER ================= */}
@@ -72,8 +72,9 @@ const PopularCategories = () => {
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
             Explore Popular
+            <br />
             <span className="text-primary">
-              Job Categories
+              <span className="text-primary isometra-regular">Job</span> Categories
             </span>
           </h2>
 
