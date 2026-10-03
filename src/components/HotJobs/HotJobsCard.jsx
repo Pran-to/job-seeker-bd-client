@@ -7,9 +7,11 @@ import {
   FaMoneyBillWave,
 } from "react-icons/fa";
 import { HiArrowRight } from "react-icons/hi2";
+import { Link } from "react-router";
 
 const HotJobCard = ({ job }) => {
   const {
+    _id,
     title,
     company,
     companyLogo,
@@ -97,10 +99,10 @@ const HotJobCard = ({ job }) => {
             Posted recently
           </span>
 
-          <button className="btn btn-primary btn-sm rounded-lg gap-2">
+          <Link to={`/jobs/${_id}`} className="btn btn-primary btn-sm rounded-lg gap-2">
             View Details
             <HiArrowRight />
-          </button>
+          </Link>
 
         </div>
 
