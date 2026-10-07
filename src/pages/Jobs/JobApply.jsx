@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -14,10 +14,12 @@ import {
   FaFileAlt,
   FaLink,
 } from "react-icons/fa";
+import AuthContext from "../../context/AuthContext/AuthContext";
 
 const JobApply = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ const JobApply = () => {
 
   // Get job information
   useEffect(() => {
-    fetch(`http://localhost:3000/jobs/${id}`)
+    fetch(`${import.meta.env.VITE_SERVER_URL}/jobs/${id}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Job not found");
@@ -72,9 +74,14 @@ const JobApply = () => {
       jobId: job._id,
       jobTitle: job.title,
       company: job.company,
+      companyLogo: job.companyLogo,
+
+      location: job.location,
+      jobType: job.jobType,
+      salary: job.salary,
 
       applicantName: formData.name,
-      applicantEmail: formData.email,
+      applicantEmail: user.email,
       applicantPhone: formData.phone,
 
       resume: formData.resume,
@@ -86,20 +93,23 @@ const JobApply = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/applications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/applications`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(applicationData),
         },
-        body: JSON.stringify(applicationData),
-      });
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         alert("Application submitted successfully!");
 
-        navigate(`/jobs/${id}`);
+        navigate(`/my-applications`);
       } else {
         alert(data.message || "Failed to submit application.");
       }
@@ -145,7 +155,6 @@ const JobApply = () => {
   return (
     <section className="min-h-screen bg-base-100 py-10 md:py-16">
       <div className="max-w-6xl mx-auto px-5 md:px-8">
-
         {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
@@ -163,9 +172,7 @@ const JobApply = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-10"
         >
-          <p className="text-primary font-semibold mb-2">
-            Job Application
-          </p>
+          <p className="text-primary font-semibold mb-2">Job Application</p>
 
           <h1 className="text-3xl md:text-4xl font-bold">
             Apply for this position
@@ -177,7 +184,6 @@ const JobApply = () => {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-
           {/* =========================
               JOB INFORMATION
           ========================== */}
@@ -188,7 +194,6 @@ const JobApply = () => {
             className="lg:col-span-1"
           >
             <div className="bg-base-200 border border-base-content/10 rounded-3xl p-6 sticky top-24">
-
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-xl bg-base-100 border border-base-content/10 overflow-hidden">
                   <img
@@ -199,29 +204,20 @@ const JobApply = () => {
                 </div>
 
                 <div>
-                  <h2 className="font-bold text-lg">
-                    {job.title}
-                  </h2>
+                  <h2 className="font-bold text-lg">{job.title}</h2>
 
-                  <p className="text-sm text-base-content/60">
-                    {job.company}
-                  </p>
+                  <p className="text-sm text-base-content/60">{job.company}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
-
                 <div className="flex items-center gap-3">
                   <FaMapMarkerAlt className="text-primary" />
 
                   <div>
-                    <p className="text-xs text-base-content/50">
-                      Location
-                    </p>
+                    <p className="text-xs text-base-content/50">Location</p>
 
-                    <p className="font-medium">
-                      {job.location}
-                    </p>
+                    <p className="font-medium">{job.location}</p>
                   </div>
                 </div>
 
@@ -229,13 +225,9 @@ const JobApply = () => {
                   <FaBriefcase className="text-primary" />
 
                   <div>
-                    <p className="text-xs text-base-content/50">
-                      Job Type
-                    </p>
+                    <p className="text-xs text-base-content/50">Job Type</p>
 
-                    <p className="font-medium">
-                      {job.jobType}
-                    </p>
+                    <p className="font-medium">{job.jobType}</p>
                   </div>
                 </div>
 
@@ -243,13 +235,9 @@ const JobApply = () => {
                   <FaMoneyBillWave className="text-primary" />
 
                   <div>
-                    <p className="text-xs text-base-content/50">
-                      Salary
-                    </p>
+                    <p className="text-xs text-base-content/50">Salary</p>
 
-                    <p className="font-medium">
-                      {job.salary}
-                    </p>
+                    <p className="font-medium">{job.salary}</p>
                   </div>
                 </div>
 
@@ -257,16 +245,11 @@ const JobApply = () => {
                   <FaBuilding className="text-primary" />
 
                   <div>
-                    <p className="text-xs text-base-content/50">
-                      Category
-                    </p>
+                    <p className="text-xs text-base-content/50">Category</p>
 
-                    <p className="font-medium">
-                      {job.category}
-                    </p>
+                    <p className="font-medium">{job.category}</p>
                   </div>
                 </div>
-
               </div>
 
               <div className="divider"></div>
@@ -276,11 +259,8 @@ const JobApply = () => {
                   Application Deadline
                 </p>
 
-                <p className="text-primary font-bold mt-1">
-                  {job.deadline}
-                </p>
+                <p className="text-primary font-bold mt-1">{job.deadline}</p>
               </div>
-
             </div>
           </motion.div>
 
@@ -297,11 +277,8 @@ const JobApply = () => {
               onSubmit={handleSubmit}
               className="bg-base-200 border border-base-content/10 rounded-3xl p-6 md:p-8"
             >
-
               <div className="mb-8">
-                <h2 className="text-2xl font-bold">
-                  Personal Information
-                </h2>
+                <h2 className="text-2xl font-bold">Personal Information</h2>
 
                 <p className="text-sm text-base-content/60 mt-2">
                   Tell the employer a little about yourself.
@@ -310,12 +287,9 @@ const JobApply = () => {
 
               {/* Name + Email */}
               <div className="grid md:grid-cols-2 gap-5">
-
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text font-medium">
-                      Full Name
-                    </span>
+                    <span className="label-text font-medium">Full Name</span>
                   </label>
 
                   <div className="relative">
@@ -346,23 +320,19 @@ const JobApply = () => {
                     <input
                       type="email"
                       name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="example@gmail.com"
+                      value={user.email}
                       className="input input-bordered w-full pl-11 rounded-xl"
+                      readOnly
                       required
                     />
                   </div>
                 </div>
-
               </div>
 
               {/* Phone */}
               <div className="form-control mt-5">
                 <label className="label">
-                  <span className="label-text font-medium">
-                    Phone Number
-                  </span>
+                  <span className="label-text font-medium">Phone Number</span>
                 </label>
 
                 <div className="relative">
@@ -382,7 +352,6 @@ const JobApply = () => {
 
               {/* Resume + Portfolio */}
               <div className="grid md:grid-cols-2 gap-5 mt-5">
-
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-medium">
@@ -437,16 +406,12 @@ const JobApply = () => {
                     </span>
                   </label>
                 </div>
-
               </div>
 
               {/* Cover Letter */}
               <div className="form-control mt-2">
-
                 <label className="label">
-                  <span className="label-text font-medium">
-                    Cover Letter
-                  </span>
+                  <span className="label-text font-medium">Cover Letter</span>
                 </label>
 
                 <div className="relative">
@@ -461,12 +426,10 @@ const JobApply = () => {
                     required
                   ></textarea>
                 </div>
-
               </div>
 
               {/* Agreement */}
               <div className="form-control mt-6">
-
                 <label className="label cursor-pointer justify-start gap-3">
                   <input
                     type="checkbox"
@@ -475,16 +438,14 @@ const JobApply = () => {
                   />
 
                   <span className="text-sm text-base-content/70">
-                    I confirm that the information provided in this
-                    application is accurate and complete.
+                    I confirm that the information provided in this application
+                    is accurate and complete.
                   </span>
                 </label>
-
               </div>
 
               {/* Submit */}
               <div className="border-t border-base-content/10 mt-6 pt-6">
-
                 <button
                   type="submit"
                   disabled={submitting}
@@ -502,12 +463,9 @@ const JobApply = () => {
                     </>
                   )}
                 </button>
-
               </div>
-
             </form>
           </motion.div>
-
         </div>
       </div>
     </section>

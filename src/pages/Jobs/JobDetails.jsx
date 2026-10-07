@@ -12,7 +12,6 @@ import { HiOutlineMail } from "react-icons/hi";
 
 const JobDetails = () => {
     const job = useLoaderData();
-    console.log(job);
  const navigate = useNavigate();
 
   // Job not found

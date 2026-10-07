@@ -19,7 +19,9 @@ const Navbar = () => {
       <li>
         <NavLink className='rounded-full' to="/">Home</NavLink>
       </li>
-      
+      <li>
+        <NavLink className='rounded-full' to="/my-applications">My Applications</NavLink>
+      </li>
     </>
   );
   return (
