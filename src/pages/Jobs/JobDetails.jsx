@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useLoaderData, useNavigate} from "react-router";
+import { Link, useLoaderData, useNavigate} from "react-router";
 import {
   FaMapMarkerAlt,
   FaBriefcase,
@@ -12,6 +12,7 @@ import { HiOutlineMail } from "react-icons/hi";
 
 const JobDetails = () => {
     const job = useLoaderData();
+    console.log(job);
  const navigate = useNavigate();
 
   // Job not found
@@ -100,9 +101,9 @@ const JobDetails = () => {
               </div>
 
               {/* Apply */}
-              <button className="btn btn-primary rounded-xl px-8">
+              <Link to={`/jobs/${job._id}/apply`} className="btn btn-primary rounded-xl px-8">
                 Apply Now
-              </button>
+              </Link>
 
             </div>
           </div>
@@ -230,10 +231,10 @@ const JobDetails = () => {
 
                   </div>
 
-                  <button className="btn btn-primary w-full mt-7 rounded-xl">
+                  <Link to={`/jobs/${job._id}/apply`} className="btn btn-primary w-full mt-7 rounded-xl">
                     <HiOutlineMail className="text-lg" />
                     Apply for this Job
-                  </button>
+                  </Link>
 
                 </div>
 

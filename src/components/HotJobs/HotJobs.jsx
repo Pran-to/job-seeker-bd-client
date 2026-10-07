@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FaFire } from "react-icons/fa";
 import { HiArrowRight } from "react-icons/hi2";
-import HotJobCard from "./HotjobsCard";
+import HotJobCard from "./HotJobCard";
 
 const HotJobs = () => {
   const [jobs, setJobs] = useState([]);

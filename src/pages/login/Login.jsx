@@ -2,10 +2,13 @@ import { Lottie } from "lottie-react";
 import lottieData from "../../assets/lottie/login.json";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext/AuthContext";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 const Login = () => {
   const { signIn,googleSignIn } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location?.state || "/"; 
   const handleLogin = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -13,7 +16,11 @@ const Login = () => {
     const password = form.password.value;
     signIn(email, password)
       .then((result) => {
-        console.log(result);
+        if (result) {
+          console.log(result.user);
+          alert("Login successful!");
+          navigate(from, { replace: true });
+        }
       })
       .catch((error) => {
         console.log(error.message);
@@ -23,7 +30,9 @@ const Login = () => {
   const handleGoogleSignIn = () => {
     googleSignIn()
       .then((result) => {
-        console.log(result);
+          alert("Login successful!");
+          navigate(from, { replace: true });
+        
       })
       .catch((error) => {
         console.log(error.message);
@@ -60,7 +69,7 @@ const Login = () => {
                 <a className="link link-hover">Forgot password?</a>
               </div>
               <Link to="/register" className="link link-hover">
-                Don't have an account?{" "}
+                Don't have an account?
                 <span className="font-bold">Register</span>
               </Link>
               <button className="btn btn-neutral mt-4">Login</button>

@@ -2,9 +2,12 @@ import { Lottie } from "lottie-react";
 import lottieData from "../../assets/lottie/register.json";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext/AuthContext";
+import { useNavigate } from "react-router";
 
 const Register = () => {
   const { createUser , googleSignIn }= useContext(AuthContext);
+   const navigate = useNavigate();
+     const from = location?.state || "/"; 
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -21,6 +24,7 @@ const Register = () => {
     createUser(email, password)
       .then((result) => {
         console.log(result);
+        navigate(from, { replace: true });
       })
       .catch((error) => {
         console.log(error.message);
@@ -31,6 +35,7 @@ const Register = () => {
     googleSignIn()
       .then((result) => {
         console.log(result);
+        navigate(from, { replace: true });
       })
       .catch((error) => {
         console.log(error.message);

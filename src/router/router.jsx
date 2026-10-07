@@ -4,6 +4,8 @@ import Home from "../pages/Home/Home";
 import Login from "../pages/login/Login";
 import Register from "../pages/register/Register";
 import JobDetails from "../pages/Jobs/JobDetails";
+import PrivateRoute from "./PrivateRoute/PrivateRoute";
+import JobApply from "../pages/Jobs/JobApply";
 
 const router = createBrowserRouter([
   {
@@ -24,8 +26,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/jobs/:id",
-        element: <JobDetails />,
+        element: <PrivateRoute><JobDetails /></PrivateRoute>,
         loader: ({ params }) => fetch(`${import.meta.env.VITE_SERVER_URL}/jobs/${params.id}`),
+      },
+      {
+        path: "/jobs/:id/apply",
+        element: <PrivateRoute><JobApply /></PrivateRoute>,
       }
 
     ],
