@@ -2,8 +2,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { FaSearch, FaBriefcase, FaMapMarkerAlt } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi2";
+import { useNavigate } from "react-router";
 
 const Banner = () => {
+  const navigate = useNavigate();
+
+  const [keyword, setKeyword] = useState("");
+  const [location, setLocation] = useState("");
   const animatedTexts = [
     "Builds Your Future.",
     "Matches Your Skills.",
@@ -17,6 +22,22 @@ const Banner = () => {
     }, 2500);
     return () => clearInterval(interval);
   }, [animatedTexts.length]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const params = new URLSearchParams();
+
+    if (keyword.trim()) {
+      params.set("keyword", keyword.trim());
+    }
+
+    if (location.trim()) {
+      params.set("location", location.trim());
+    }
+
+    navigate(`/find-jobs?${params.toString()}`);
+  };
   return (
     <section className="relative overflow-hidden bg-base-100 min-h-[620px] flex items-center">
       {/* Background Decorations */}
@@ -80,7 +101,8 @@ const Banner = () => {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight "
             >
-              Find a <span className="text-primary isometra-regular">Job</span> That <br />
+              Find a <span className="text-primary isometra-regular">Job</span>{" "}
+              That <br />
               <span className="text-primary inline-block min-w-[300px]">
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -110,10 +132,11 @@ const Banner = () => {
             </motion.p>
 
             {/* Search Box */}
-            <motion.div
+            <motion.form
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.7 }}
+              onSubmit={handleSearch}
               className="mt-8 p-2 bg-base-200 rounded-2xl shadow-xl border border-base-content/10"
             >
               <div className="flex flex-col md:flex-row gap-2">
@@ -123,6 +146,8 @@ const Banner = () => {
 
                   <input
                     type="text"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
                     placeholder="Job title, keywords..."
                     className="input input-ghost w-full focus:outline-none"
                   />
@@ -134,18 +159,23 @@ const Banner = () => {
 
                   <input
                     type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     placeholder="Location"
                     className="input input-ghost w-full focus:outline-none"
                   />
                 </div>
 
                 {/* Search Button */}
-                <button className="btn bg-primary hover:bg-primary/90 text-black border-none rounded-xl px-7">
+                <button
+                  type="submit"
+                  className="btn bg-primary hover:bg-primary/90 text-black border-none rounded-xl px-7"
+                >
                   <FaSearch />
                   Search Jobs
                 </button>
               </div>
-            </motion.div>
+            </motion.form>
 
             {/* Quick Stats */}
             <motion.div

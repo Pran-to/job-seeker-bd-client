@@ -19,6 +19,9 @@ const Navbar = () => {
       <li>
         <NavLink className='rounded-full' to="/">Home</NavLink>
       </li>
+       <li>
+        <NavLink className='rounded-full' to="/find-jobs">Find Jobs</NavLink>
+      </li>
       <li>
         <NavLink className='rounded-full' to="/my-applications">My Applications</NavLink>
       </li>

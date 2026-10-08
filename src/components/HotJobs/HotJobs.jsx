@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { FaFire } from "react-icons/fa";
 import { HiArrowRight } from "react-icons/hi2";
 import HotJobCard from "./HotJobCard";
+import { Link } from "react-router";
 
 const HotJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -57,10 +58,10 @@ const HotJobs = () => {
           </div>
 
           {/* View All */}
-          <button className="btn btn-outline btn-primary rounded-xl gap-2 w-fit">
+          <Link to="/find-jobs" className="btn btn-outline btn-primary rounded-xl gap-2 w-fit">
             View All Jobs
             <HiArrowRight />
-          </button>
+          </Link>
 
         </motion.div>
 

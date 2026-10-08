@@ -7,11 +7,12 @@ import JobDetails from "../pages/Jobs/JobDetails";
 import PrivateRoute from "./PrivateRoute/PrivateRoute";
 import JobApply from "../pages/Jobs/JobApply";
 import MyApplications from "../pages/Jobs/MyApplications";
+import FindJob from "../pages/Jobs/FindJob";
 
 const router = createBrowserRouter([
   {
     path: "/",
-   element: <MainLayout />,
+    element: <MainLayout />,
     children: [
       {
         index: true,
@@ -23,22 +24,38 @@ const router = createBrowserRouter([
       },
       {
         path: "/register",
-        element:<Register />,
+        element: <Register />,
       },
       {
         path: "/jobs/:id",
-        element: <PrivateRoute><JobDetails /></PrivateRoute>,
-        loader: ({ params }) => fetch(`${import.meta.env.VITE_SERVER_URL}/jobs/${params.id}`),
+        element: (
+          <PrivateRoute>
+            <JobDetails />
+          </PrivateRoute>
+        ),
+        loader: ({ params }) =>
+          fetch(`${import.meta.env.VITE_SERVER_URL}/jobs/${params.id}`),
       },
       {
         path: "/jobs/:id/apply",
-        element: <PrivateRoute><JobApply /></PrivateRoute>,
+        element: (
+          <PrivateRoute>
+            <JobApply />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/my-applications",
-        element: <PrivateRoute><MyApplications /></PrivateRoute>,
-      }
-
+        element: (
+          <PrivateRoute>
+            <MyApplications />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/find-jobs",
+        element: <FindJob />,
+      },
     ],
   },
 ]);
