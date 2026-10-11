@@ -3,6 +3,7 @@ import lottieData from "../../assets/lottie/register.json";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext/AuthContext";
 import { useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 const Register = () => {
   const { createUser , googleSignIn }= useContext(AuthContext);
@@ -23,22 +24,24 @@ const Register = () => {
 
     createUser(email, password)
       .then((result) => {
-        console.log(result);
-        navigate(from, { replace: true });
+        if (result) {
+          toast.success("User created successfully!"); 
+          navigate(from, { replace: true });
+        }
       })
       .catch((error) => {
-        console.log(error.message);
+        toast.error("Failed to create user.",error.message);
       });
       e.target.reset();
   };
    const handleGoogleSignIn = () => {
     googleSignIn()
       .then((result) => {
-        console.log(result);
+        toast.success("Google login successful!");
         navigate(from, { replace: true });
       })
       .catch((error) => {
-        console.log(error.message);
+        toast.error(error.message);
       });
   };
 

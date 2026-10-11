@@ -2,16 +2,17 @@ import { Link, NavLink } from "react-router";
 import Logo from "../logo/Logo";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext/AuthContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const{ user,logOut } = useContext(AuthContext);
   const handleLogOut = () => {
     logOut()
       .then(() => {
-        alert("Logged out successfully");
+        toast.success("Logged out successfully");
       })
       .catch((error) => {
-        console.error("Error logging out:", error);
+        toast.error("Failed to log out.", error.message);
       });
   };
   const links = (
@@ -24,6 +25,12 @@ const Navbar = () => {
       </li>
       <li>
         <NavLink className='rounded-full' to="/my-applications">My Applications</NavLink>
+      </li>
+      <li>
+        <NavLink className='rounded-full' to="/add-job">Post a Job</NavLink>
+      </li>
+      <li>
+        <NavLink className='rounded-full' to="/my-posted-jobs">My Posted Jobs</NavLink>
       </li>
     </>
   );

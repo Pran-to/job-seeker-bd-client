@@ -3,6 +3,7 @@ import lottieData from "../../assets/lottie/login.json";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext/AuthContext";
 import { Link, useLocation, useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const { signIn,googleSignIn } = useContext(AuthContext);
@@ -18,24 +19,25 @@ const Login = () => {
       .then((result) => {
         if (result) {
           console.log(result.user);
-          alert("Login successful!");
+          toast.success("Login successful!");
           navigate(from, { replace: true });
         }
       })
       .catch((error) => {
-        console.log(error.message);
+        toast.error("Failed to login.", error.message);
       });
       e.target.reset();
   };
   const handleGoogleSignIn = () => {
     googleSignIn()
       .then((result) => {
-          alert("Login successful!");
+          toast.success("Login successful!");
           navigate(from, { replace: true });
         
       })
       .catch((error) => {
-        console.log(error.message);
+        toast.error(error.message);
+        toast.error("Failed to login.");
       });
   };
   return (

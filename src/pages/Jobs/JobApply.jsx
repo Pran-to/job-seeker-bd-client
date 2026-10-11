@@ -15,6 +15,7 @@ import {
   FaLink,
 } from "react-icons/fa";
 import AuthContext from "../../context/AuthContext/AuthContext";
+import toast from "react-hot-toast";
 
 const JobApply = () => {
   const { id } = useParams();
@@ -49,7 +50,7 @@ const JobApply = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.error(error);
+        toast.error(error);
         setLoading(false);
       });
   }, [id]);
@@ -71,7 +72,7 @@ const JobApply = () => {
     setSubmitting(true);
 
     const applicationData = {
-      jobId: job._id,
+      jobId: String(job._id),
       jobTitle: job.title,
       company: job.company,
       companyLogo: job.companyLogo,
@@ -107,15 +108,15 @@ const JobApply = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Application submitted successfully!");
+        toast.success("Application submitted successfully!");
 
         navigate(`/my-applications`);
       } else {
-        alert(data.message || "Failed to submit application.");
+        toast.error(data.message || "Failed to submit application.");
       }
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong. Please try again.");
+      toast.error(error);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }

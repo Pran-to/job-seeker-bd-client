@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
 import {
@@ -9,41 +9,81 @@ import {
   FaCalendarAlt,
   FaEye,
   FaClipboardList,
+  FaSyncAlt,
 } from "react-icons/fa";
 import AuthContext from "../../context/AuthContext/AuthContext";
+import toast from "react-hot-toast";
+
+const API = import.meta.env.VITE_SERVER_URL;
 
 const MyApplications = () => {
   const navigate = useNavigate();
-  const {user} = useContext(AuthContext)
+  const { user } = useContext(AuthContext);
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
 
+  // Fetch applications belonging to the logged-in applicant.
+  const fetchApplications = useCallback(
+    async (showLoader = false) => {
+      if (!user?.email) {
+        setApplications([]);
+        setLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_SERVER_URL}/applications?email=${user.email}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to load applications");
+      if (showLoader) {
+        setRefreshing(true);
+      }
+
+      try {
+        setError("");
+
+        const response = await fetch(
+          `${API}/applications?email=${encodeURIComponent(user.email)}`,
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load applications.");
         }
 
-        return res.json();
-      })
-      .then((data) => {
-        setApplications(data);
+        const data = await response.json();
+        setApplications(Array.isArray(data) ? data : []);
+      } catch (err) {
+        toast.error("Error loading applications:", err);
+        setError(err.message || "Unable to load your applications.");
+      } finally {
         setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
-  }, []);
+        setRefreshing(false);
+      }
+    },
+    [user],
+  );
 
-  // Loading state
+  // Initial fetch and refresh when the logged-in user changes.
+  useEffect(() => {
+    if (!user?.email) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    fetchApplications();
+
+    // Check for HR/Admin status changes every 15 seconds.
+    const intervalId = setInterval(() => {
+      fetchApplications();
+    }, 15000);
+
+    return () => clearInterval(intervalId);
+  }, [user, fetchApplications]);
+
   if (loading) {
     return (
       <section className="min-h-screen bg-base-100 flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+        <span className="loading loading-spinner loading-lg text-primary" />
       </section>
     );
   }
@@ -51,35 +91,62 @@ const MyApplications = () => {
   return (
     <section className="min-h-screen bg-base-100 py-12 md:py-16">
       <div className="max-w-6xl mx-auto px-5 md:px-8">
-
-        {/* ================= HEADER ================= */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="mb-10"
         >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-              <FaClipboardList className="text-primary text-xl" />
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FaClipboardList className="text-primary text-xl" />
+              </div>
+
+              <span className="text-primary font-semibold">
+                Career Dashboard
+              </span>
             </div>
 
-            <span className="text-primary font-semibold">
-              Career Dashboard
-            </span>
+            <button
+              type="button"
+              onClick={() => fetchApplications(true)}
+              disabled={refreshing}
+              className="btn btn-outline btn-primary btn-sm rounded-xl"
+            >
+              <FaSyncAlt className={refreshing ? "animate-spin" : ""} />
+              {refreshing ? "Refreshing..." : "Refresh Status"}
+            </button>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold">
-            My Applications
-          </h1>
+          <h1 className="text-3xl md:text-4xl font-bold">My Applications</h1>
 
           <p className="text-base-content/60 mt-3 max-w-2xl">
-            Track all the jobs you have applied for and check your
-            application status.
+            Track your job applications and see the latest decisions from
+            employers.
+          </p>
+
+          <p className="text-xs text-base-content/50 mt-2">
+            Application statuses refresh automatically every 15 seconds.
           </p>
         </motion.div>
 
-        {/* ================= EMPTY STATE ================= */}
+        {/* Error message */}
+        {error && (
+          <div role="alert" className="alert alert-error mb-6">
+            <span>{error}</span>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={() => fetchApplications(true)}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Empty state */}
         {applications.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -90,17 +157,16 @@ const MyApplications = () => {
               <FaBriefcase className="text-primary text-3xl" />
             </div>
 
-            <h2 className="text-2xl font-bold mt-6">
-              No Applications Yet
-            </h2>
+            <h2 className="text-2xl font-bold mt-6">No Applications Yet</h2>
 
             <p className="text-base-content/60 mt-3 max-w-md mx-auto">
-              You haven't applied for any jobs yet. Explore available jobs
-              and start building your career today.
+              You haven't applied for any jobs yet. Explore available jobs and
+              start building your career today.
             </p>
 
             <button
-              onClick={() => navigate("/jobs")}
+              type="button"
+              onClick={() => navigate("/find-jobs")}
               className="btn btn-primary mt-7 rounded-xl"
             >
               Browse Jobs
@@ -108,17 +174,15 @@ const MyApplications = () => {
           </motion.div>
         ) : (
           <>
-            {/* ================= APPLICATION COUNT ================= */}
+            {/* Application count */}
             <div className="mb-6">
               <div className="badge badge-primary badge-lg">
                 {applications.length}{" "}
-                {applications.length === 1
-                  ? "Application"
-                  : "Applications"}
+                {applications.length === 1 ? "Application" : "Applications"}
               </div>
             </div>
 
-            {/* ================= APPLICATION LIST ================= */}
+            {/* Application list */}
             <div className="space-y-5">
               {applications.map((application, index) => (
                 <motion.div
@@ -133,13 +197,12 @@ const MyApplications = () => {
                   className="bg-base-200 border border-base-content/10 rounded-2xl p-5 md:p-6 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all"
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-
-                    {/* Company Logo */}
+                    {/* Company logo */}
                     <div className="w-16 h-16 rounded-xl bg-base-100 border border-base-content/10 flex items-center justify-center overflow-hidden shrink-0">
                       {application.companyLogo ? (
                         <img
                           src={application.companyLogo}
-                          alt={`${application.company} logo`}
+                          alt={`${application.company || "Company"} logo`}
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -147,25 +210,22 @@ const MyApplications = () => {
                       )}
                     </div>
 
-                    {/* Job Information */}
+                    {/* Job information */}
                     <div className="flex-1 min-w-0">
-
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-xl font-bold">
-                          {application.jobTitle}
+                          {application.jobTitle || "Job title unavailable"}
                         </h2>
 
                         <StatusBadge status={application.status} />
                       </div>
 
                       <p className="text-base-content/60 mt-1 flex items-center gap-2">
-                        <FaBuilding className="text-primary" />
-                        {application.company}
+                        <FaBuilding className="text-primary shrink-0" />
+                        {application.company || "Company unavailable"}
                       </p>
 
-                      {/* Job Details */}
                       <div className="flex flex-wrap gap-x-5 gap-y-2 mt-4 text-sm text-base-content/60">
-
                         {application.location && (
                           <span className="flex items-center gap-2">
                             <FaMapMarkerAlt className="text-primary" />
@@ -186,20 +246,33 @@ const MyApplications = () => {
                             {application.salary}
                           </span>
                         )}
-
                       </div>
+
+                      {/* Latest review information */}
+                      {application.reviewedAt && (
+                        <p className="text-xs text-base-content/50 mt-3">
+                          Last reviewed:{" "}
+                          {new Date(application.reviewedAt).toLocaleDateString(
+                            "en-BD",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
+                        </p>
+                      )}
                     </div>
 
-                    {/* Application Date + Button */}
+                    {/* Application date and button */}
                     <div className="lg:text-right shrink-0">
-
                       <div className="flex lg:justify-end items-center gap-2 text-sm text-base-content/50">
                         <FaCalendarAlt className="text-primary" />
                         <span>
                           Applied{" "}
                           {application.appliedAt
                             ? new Date(
-                                application.appliedAt
+                                application.appliedAt,
                               ).toLocaleDateString("en-BD", {
                                 day: "2-digit",
                                 month: "short",
@@ -210,10 +283,10 @@ const MyApplications = () => {
                       </div>
 
                       <button
-                        onClick={() =>
-                          navigate(`/jobs/${application.jobId}`)
-                        }
+                        type="button"
+                        onClick={() => navigate(`/jobs/${application.jobId}`)}
                         className="btn btn-outline btn-primary btn-sm rounded-lg gap-2 mt-4"
+                        disabled={!application.jobId}
                       >
                         <FaEye />
                         View Job
@@ -230,39 +303,50 @@ const MyApplications = () => {
   );
 };
 
-/* ================= STATUS BADGE ================= */
+/* Status badge */
 
 const StatusBadge = ({ status }) => {
-  const normalizedStatus = status?.toLowerCase();
+  const normalizedStatus = (status || "Pending").toLowerCase();
 
-  if (normalizedStatus === "accepted") {
-    return (
-      <span className="badge badge-success gap-1">
-        Accepted
-      </span>
-    );
-  }
+  const statusConfig = {
+    pending: {
+      label: "Pending",
+      className: "badge-warning",
+    },
+    accept: {
+      label: "Accepted",
+      className: "badge-success",
+    },
+    accepted: {
+      label: "Accepted",
+      className: "badge-success",
+    },
+    reject: {
+      label: "Rejected",
+      className: "badge-error",
+    },
+    rejected: {
+      label: "Rejected",
+      className: "badge-error",
+    },
+    hire: {
+      label: "Hired",
+      className: "badge-success",
+    },
+    hired: {
+      label: "Hired",
+      className: "badge-success",
+    },
+    interview: {
+      label: "Interview",
+      className: "badge-info",
+    },
+  };
 
-  if (normalizedStatus === "rejected") {
-    return (
-      <span className="badge badge-error gap-1">
-        Rejected
-      </span>
-    );
-  }
-
-  if (normalizedStatus === "interview") {
-    return (
-      <span className="badge badge-info gap-1">
-        Interview
-      </span>
-    );
-  }
+  const config = statusConfig[normalizedStatus] || statusConfig.pending;
 
   return (
-    <span className="badge badge-warning gap-1">
-      Pending
-    </span>
+    <span className={`badge ${config.className} gap-1`}>{config.label}</span>
   );
 };
 
