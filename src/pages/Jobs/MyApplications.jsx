@@ -41,9 +41,9 @@ const MyApplications = () => {
       try {
         setError("");
 
-        const response = await fetch(
-          `${API}/applications?email=${encodeURIComponent(user.email)}`,
-        );
+        const response = await fetch(`${API}/applications`, {
+          headers: { Authorization: `Bearer ${await user.getIdToken()}` },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to load applications.");

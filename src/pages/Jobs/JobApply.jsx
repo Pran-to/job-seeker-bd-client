@@ -100,6 +100,7 @@ const JobApply = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${await user.getIdToken()}`,
           },
           body: JSON.stringify(applicationData),
         },
@@ -110,7 +111,7 @@ const JobApply = () => {
       if (response.ok) {
         toast.success("Application submitted successfully!");
 
-        navigate(`/my-applications`);
+        navigate("/dashboard/my-applications");
       } else {
         toast.error(data.message || "Failed to submit application.");
       }

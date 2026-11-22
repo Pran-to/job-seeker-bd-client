@@ -32,6 +32,7 @@ const MyPostedJobs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
+  const authHeaders = useCallback(async () => ({ Authorization: `Bearer ${await user.getIdToken()}` }), [user]);
 
   const fetchJobs = useCallback(async () => {
     if (!email) {
@@ -43,7 +44,8 @@ const MyPostedJobs = () => {
     try {
       setError("");
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/my-jobs?email=${encodeURIComponent(email)}`,
+        `${import.meta.env.VITE_SERVER_URL}/my-jobs`,
+        { headers: await authHeaders() },
       );
       const data = await response.json();
 
@@ -57,7 +59,7 @@ const MyPostedJobs = () => {
     } finally {
       setLoading(false);
     }
-  }, [email]);
+  }, [email, authHeaders]);
 
   useEffect(() => {
     fetchJobs();
@@ -78,7 +80,8 @@ const MyPostedJobs = () => {
       setBusyId(jobId);
 
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/jobs/${jobId}/applications?email=${encodeURIComponent(email)}`,
+        `${import.meta.env.VITE_SERVER_URL}/jobs/${jobId}/applications`,
+        { headers: await authHeaders() },
       );
       const data = await response.json();
 
@@ -100,15 +103,11 @@ const MyPostedJobs = () => {
     );
 
     if (!confirmed) return;
-    if (confirmed) {
-      toast.success("Job deleted successfully!");
-    }
-
     try {
       setBusyId(job._id);
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/jobs/${job._id}?email=${encodeURIComponent(email)}`,
-        { method: "DELETE" },
+        { method: "DELETE", headers: await authHeaders() },
       );
       const data = await response.json();
 
@@ -121,6 +120,7 @@ const MyPostedJobs = () => {
         return next;
       });
       setExpandedJob(null);
+      toast.success("Job deleted successfully!");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -139,10 +139,10 @@ const MyPostedJobs = () => {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
+            ...(await authHeaders()),
           },
           body: JSON.stringify({
             status,
-            ownerEmail: user.email.toLowerCase(),
           }),
         },
       );

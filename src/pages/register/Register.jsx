@@ -2,13 +2,14 @@ import { Lottie } from "lottie-react";
 import lottieData from "../../assets/lottie/register.json";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext/AuthContext";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import toast from "react-hot-toast";
 
 const Register = () => {
   const { createUser , googleSignIn }= useContext(AuthContext);
    const navigate = useNavigate();
-     const from = location?.state || "/"; 
+   const location = useLocation();
+   const from = location?.state || "/dashboard"; 
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -76,6 +77,7 @@ const Register = () => {
                
             </fieldset>
           </form>
+          <h1 className="text-center divider ">OR</h1>
            <button onClick={handleGoogleSignIn} className="btn bg-white text-black border-[#e5e5e5]">
                 <svg
                   aria-label="Google logo"

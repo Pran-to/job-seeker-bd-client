@@ -1,35 +1,30 @@
 import { createBrowserRouter } from "react-router";
 import MainLayout from "../layout/MainLayout/MainLayout";
+import DashboardLayout from "../layout/DashboardLayout";
 import Home from "../pages/Home/Home";
 import Login from "../pages/login/Login";
 import Register from "../pages/register/Register";
 import JobDetails from "../pages/Jobs/JobDetails";
 import PrivateRoute from "./PrivateRoute/PrivateRoute";
+import RoleRoute from "./RoleRoute";
 import JobApply from "../pages/Jobs/JobApply";
 import MyApplications from "../pages/Jobs/MyApplications";
 import FindJob from "../pages/Jobs/FindJob";
 import AddJob from "../pages/Jobs/AddJob";
 import MyPostedJobs from "../pages/Jobs/MyPostedJobs";
+import DashboardHome from "../pages/Dashboard/DashboardHome";
+import AdminUsers from "../pages/Dashboard/AdminUsers";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
       {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        path: "/jobs/:id",
+        path: "jobs/:id",
         element: (
           <PrivateRoute>
             <JobDetails />
@@ -39,39 +34,107 @@ const router = createBrowserRouter([
           fetch(`${import.meta.env.VITE_SERVER_URL}/jobs/${params.id}`),
       },
       {
-        path: "/jobs/:id/apply",
+        path: "jobs/:id/apply",
         element: (
-          <PrivateRoute>
+          <RoleRoute allowedRoles={["applicant"]}>
             <JobApply />
-          </PrivateRoute>
+          </RoleRoute>
         ),
       },
+      { path: "find-jobs", element: <FindJob /> },
       {
-        path: "/my-applications",
+        path: "dashboard",
         element: (
           <PrivateRoute>
-            <MyApplications />
+            <DashboardLayout />
           </PrivateRoute>
+        ),
+        children: [
+          { index: true, element: <DashboardHome /> },
+          {
+            path: "my-applications",
+            element: (
+              <RoleRoute allowedRoles={["applicant"]}>
+                <MyApplications />
+              </RoleRoute>
+            ),
+          },
+          {
+            path: "my-posted-jobs",
+            element: (
+              <RoleRoute allowedRoles={["hr", "admin"]}>
+                <MyPostedJobs />
+              </RoleRoute>
+            ),
+          },
+          {
+            path: "add-job",
+            element: (
+              <RoleRoute allowedRoles={["hr", "admin"]}>
+                <AddJob />
+              </RoleRoute>
+            ),
+          },
+          {
+            path: "add-job/:id",
+            element: (
+              <RoleRoute allowedRoles={["hr", "admin"]}>
+                <AddJob />
+              </RoleRoute>
+            ),
+          },
+          {
+            path: "users",
+            element: (
+              <RoleRoute allowedRoles={["admin"]}>
+                <AdminUsers />
+              </RoleRoute>
+            ),
+          },
+        ],
+      },
+      // Keep old URLs working while applying the same role restrictions.
+      {
+        path: "my-applications",
+        element: (
+          <RoleRoute allowedRoles={["applicant"]}>
+            <MyApplications />
+          </RoleRoute>
         ),
       },
       {
-        path: "/find-jobs",
-        element: <FindJob />,
+        path: "add-job",
+        element: (
+          <RoleRoute allowedRoles={["hr", "admin"]}>
+            <AddJob />
+          </RoleRoute>
+        ),
       },
       {
-        path: "/add-job",
-        element: <PrivateRoute><AddJob /></PrivateRoute>,
+        path: "add-job/:id",
+        element: (
+          <RoleRoute allowedRoles={["hr", "admin"]}>
+            <AddJob />
+          </RoleRoute>
+        ),
       },
       {
-        path: "/add-job/:id",
-        element: <PrivateRoute><AddJob /></PrivateRoute>,
+        path: "my-posted-jobs",
+        element: (
+          <RoleRoute allowedRoles={["hr", "admin"]}>
+            <MyPostedJobs />
+          </RoleRoute>
+        ),
       },
       {
-        path: "/my-posted-jobs",
-        element: <PrivateRoute><MyPostedJobs /></PrivateRoute>,
+        path: "admin/users",
+        element: (
+          <RoleRoute allowedRoles={["admin"]}>
+            <AdminUsers />
+          </RoleRoute>
+        ),
       },
     ],
   },
 ]);
-
 export default router;

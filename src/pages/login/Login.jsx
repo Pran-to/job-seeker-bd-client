@@ -9,7 +9,7 @@ const Login = () => {
   const { signIn,googleSignIn } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location?.state || "/"; 
+  const from = location?.state || "/dashboard"; 
   const handleLogin = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -75,6 +75,7 @@ const Login = () => {
                 <span className="font-bold">Register</span>
               </Link>
               <button className="btn btn-neutral mt-4">Login</button>
+              <h1 className="text-center divider ">OR</h1>
               <button onClick={handleGoogleSignIn} className="btn bg-white text-black border-[#e5e5e5]">
                 <svg
                   aria-label="Google logo"
@@ -107,7 +108,7 @@ const Login = () => {
               </button>
             </fieldset>
           </form>
-        </div>
+        </div>  
       </div>
     </div>
   );

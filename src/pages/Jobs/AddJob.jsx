@@ -84,9 +84,10 @@ const AddJob = () => {
         ...(id ? { ownerEmail: email.toLowerCase() } : {}),
       };
 
+      const token = await user.getIdToken();
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
 
@@ -97,7 +98,7 @@ const AddJob = () => {
       }
        toast.success(id ? "Job updated successfully!" : "Job posted successfully!");
       // After posting or updating, go to My Posted Jobs.
-      navigate("/my-posted-jobs");
+      navigate("/dashboard/my-posted-jobs");
     } catch (err) {
       setError(err.message);
       toast.error(err.message);

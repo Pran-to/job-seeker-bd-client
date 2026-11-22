@@ -5,7 +5,7 @@ import AuthContext from "../../context/AuthContext/AuthContext";
 import toast from "react-hot-toast";
 
 const Navbar = () => {
-  const{ user,logOut } = useContext(AuthContext);
+  const { user, userRole, logOut } = useContext(AuthContext);
   const handleLogOut = () => {
     logOut()
       .then(() => {
@@ -17,21 +17,9 @@ const Navbar = () => {
   };
   const links = (
     <>
-      <li>
-        <NavLink className='rounded-full' to="/">Home</NavLink>
-      </li>
-       <li>
-        <NavLink className='rounded-full' to="/find-jobs">Find Jobs</NavLink>
-      </li>
-      <li>
-        <NavLink className='rounded-full' to="/my-applications">My Applications</NavLink>
-      </li>
-      <li>
-        <NavLink className='rounded-full' to="/add-job">Post a Job</NavLink>
-      </li>
-      <li>
-        <NavLink className='rounded-full' to="/my-posted-jobs">My Posted Jobs</NavLink>
-      </li>
+      <li><NavLink className="rounded-full" to="/">Home</NavLink></li>
+      <li><NavLink className="rounded-full" to="/find-jobs">Find Jobs</NavLink></li>
+      {user && <li><NavLink className="rounded-full" to="/dashboard">Dashboard</NavLink></li>}
     </>
   );
   return (
@@ -76,7 +64,7 @@ const Navbar = () => {
       </div>
       <div className="navbar-end gap-2">
         {
-          user ? <button onClick={handleLogOut} className="btn btn-primary rounded-full font-bold">Logout</button> : <>
+          user ? <><span className="hidden sm:inline text-xs badge badge-outline pt-0.5 bg-green-600 text-white border-cyan-400 font-bold ">{userRole || "Loading role"}</span><button onClick={handleLogOut} className="btn btn-primary rounded-full font-bold">Logout</button></> : <>
            <Link to="/register">Register</Link>
         <Link to="/login" className="btn btn-primary rounded-full font-bold">Login</Link>
         </>

@@ -9,6 +9,7 @@ import {
   FaGraduationCap,
 } from "react-icons/fa";
 import { HiArrowRight } from "react-icons/hi2";
+import { Link } from "react-router";
 
 const categories = [
   {
@@ -163,10 +164,10 @@ const PopularCategories = () => {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="flex justify-center mt-10"
         >
-          <button className="btn btn-outline btn-primary rounded-xl px-7 gap-2">
+          <Link to="/find-jobs" className="btn btn-outline btn-primary rounded-xl px-7 gap-2">
             View All Categories
             <HiArrowRight />
-          </button>
+          </Link>
         </motion.div>
 
       </div>
